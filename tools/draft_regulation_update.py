@@ -38,6 +38,9 @@ Rules:
 - Follow step 2 of the attached regulation transition runbook. Do not edit generated files, plugins, the site, workflows, tools, or data/official-regulation-feed.json; the workflow regenerates and updates those after you finish.
 - Both evidence hosts are official: news.pokemon-home.com is Pokemon HOME news, and web-view.app.pokemonchampions.jp is the Pokemon Champions in-game web view. Use the HOME page URL as the official source URL for a new regulation, and cite the eligible Pokemon page by URL in the legality note.
 - Use the regulation window stated on the official page, not the feed display window.
+- If the new regulation starts in the future, add it as `temporal_status: upcoming`; keep the previous regulation `current`; do not change `current-regulation.md`.
+- If the new regulation has already started, activate it: new regulation `current`, previous regulation `historical`, and update `current-regulation.md` to the new legality note.
+- Add an `official_roster` source only when the official page links the eligible roster. If the page says full details are pending and does not link a roster, do not add one.
 - The workflow fetched the evidence at the report's `checked_at` time. Use that as `fetched_at`, and its date as `verified_on`.
 - In tests, update only assertions that read checked-in repository files, such as the registry, snapshots, fixture examples, and rendered docs. Search every test for the old regulation id, display name, URL, and window. Do not change tests that build temporary repositories with fixed example regulations.
 - You cannot run tests or tools. The workflow validates your draft afterwards.

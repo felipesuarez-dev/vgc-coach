@@ -67,6 +67,14 @@ class ValidateTests(unittest.TestCase):
                     ),
                 ),
                 (
+                    "source probe coverage check",
+                    (
+                        "/controlled/python",
+                        "tools/probe_sources.py",
+                        "--offline",
+                    ),
+                ),
+                (
                     "current-format freshness check",
                     (
                         "/controlled/python",

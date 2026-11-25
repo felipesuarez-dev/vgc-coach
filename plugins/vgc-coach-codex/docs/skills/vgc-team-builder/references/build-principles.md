@@ -25,9 +25,10 @@ Before finalizing the draft, answer:
 
 - Build one primary team, not a menu of branches.
 - If you mention optional swaps, keep them for the final refinement section only.
-- Use `current-field recommendation` only when the shared recommended minimum live stack in [Shared Live Source Map](../../shared/references/live-source-map.md) succeeds.
-- If that stack is incomplete, call the build an `inference-heavy early read`.
+- Use `current-field recommendation` only when the shared recommended minimum live stack in [Shared Live Source Map](../../shared/references/live-source-map.md) succeeds and the current official roster is available for team building.
+- If that stack or the roster is incomplete, call the build an `inference-heavy early read`.
 - Summarize the shared [Verification Packet](../../shared/references/verification-packet.md) before recommending slots when current format, legality, meta, matchup, item, move, or mechanics claims materially affect the build.
+- Never treat roster membership as proof that an item, move, ability, or mechanic is legal.
 
 ## Evidence and Confidence
 
@@ -70,11 +71,14 @@ Do not force battle-ready output onto normal shell-building requests.
 In battle-ready mode:
 
 - keep one primary six
+- add `Meta Snapshot and Fallbacks`
 - add `Targeted Meta Cores and Teams`
+- add `Legality Ledger`
 - build a capped benchmark plan
 - hand narrow spread questions to `vgc-calcs-assistant`
 - return `Battle-Ready Spreads`
 - return `Playbook`
+- add `Synergy and Matchup Audit`
 - end with explicit `Export Status`
 
 ## Requested Mon Handling
@@ -114,17 +118,73 @@ In battle-ready mode, `Battle-Ready Spreads` should add:
 
 If named items or moves are not verified, the build may still be battle-ready, but it is not export-ready.
 
+## Meta Snapshot And Fallbacks
+
+In battle-ready mode, the snapshot must name:
+
+- the current official regulation and roster, with the roster count when available
+- one tournament-focused source with its fetched date and sample scope
+- one broader usage source with its publication month or fetched date
+- every fallback used because a source failed or was blocked
+
+Use `current-field recommendation` only when the required stack and roster succeed. If a source failed, say which one and what replaced it. Do not silently substitute a weaker source.
+
+## Legality Ledger
+
+Before locking items, moves, spreads, or an export, build a compact ledger:
+
+| Slot | Species | Species source | Item status | Move status | Mechanics | Export |
+|---|---|---|---|---|---|---|
+
+Rules:
+
+- Species eligibility comes from the current official roster.
+- Item, move, ability, and mechanic legality require separate evidence.
+- Use `verified`, `partial`, or `unverified` per row.
+- If an item or move is unverified, label it `unverified/provisional` inline and downgrade `Export Status`.
+- Never invent an item, move, ability, or mechanic to fill the ledger.
+
+## Synergy And Matchup Audit
+
+After the six is chosen, audit:
+
+- speed control
+- Trick Room
+- weather
+- Fake Out
+- endgame
+- role overlap
+- item and ability overlap
+- support and closer balance
+
+State `pass`, `partial`, or `fail` for each and give one concrete fix for every partial or fail. See [Synergy Audit](./synergy-audit.md).
+
+## Export Gate
+
+`export-ready` requires all of the following:
+
+- every named species is in the current official roster
+- every named item, ability, move, and mechanic is verified
+- the benchmark notes are complete
+- the spreads are usable in the active format
+
+A Showdown paste may be offered only under those conditions. A Champions build sheet may be offered when the spreads are usable but some item or move is provisional. Do not invent a Champions import string.
+
 ## Targeted Meta Cores And Teams
 
 In battle-ready mode, use live current-field shells as first-class inputs:
 
-- `2-mon`, `3-mon`, and `4-mon` common cores
+- `2-mon`, `3-mon`, and `4-mon` common cores counted from Limitless top standings decklists
+- the `4-mon`, `5-mon`, and `6-mon` compositions that LabMaus actually publishes
 - recent top teams from current tournaments
 - individual high-usage threats when shell coverage is still incomplete
+
+Do not invent a 2-mon or 3-mon LabMaus core. If the source does not publish that shape, use Limitless or say the shape is unavailable.
 
 The visible `Targeted Meta Cores and Teams` section should:
 
 - usually contain 3 to 5 entries total
+- name the source and date or event for every entry
 - list only the shells that materially shaped slot choice, benchmark selection, or matchup notes
 - stay short and actionable instead of turning into a mini meta report
 
@@ -155,6 +215,7 @@ Rules:
 
 - require at least one benchmark tied to the team's main win path
 - do not require a benchmark for every slot
+- do not run a benchmark before the legality ledger verifies the species, item, ability, move package, and mechanics it depends on
 - utility or support slots may keep heuristic spreads when no benchmark changes a real decision
 - hand off only narrow benchmark questions to `vgc-calcs-assistant`
 - do not ask `vgc-calcs-assistant` to optimize the whole team

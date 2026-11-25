@@ -36,6 +36,8 @@ For a `current-field recommendation`, the packet must include:
 - fetched dates for every source used in the minimum stack
 - no material conflict that changes the recommendation
 
+For a team-building recommendation, the packet must also include at least one current official roster source. The roster verifies species eligibility only; it does not verify items, moves, abilities, or mechanics.
+
 If the minimum stack is incomplete, conflicted, or too stale for the claim, label current-field coaching as `inference-heavy early read`.
 
 ## Legality Ledger
@@ -43,12 +45,12 @@ If the minimum stack is incomplete, conflicted, or too stale for the claim, labe
 The legality ledger should cover only claims that materially affect the answer. It must include:
 
 - requested species or forms when the build, audit, or plan depends on them
-- all supporting species in a recommended team
+- all supporting species in a recommended team, checked against the current official roster
 - exact held items when they are recommended as legal
 - exact moves when a locked move set or turn plan depends on move access
 - active mechanics when mechanics change positioning, such as Mega Evolution or Terastallization
 
-Use `officially verified` only for legality claims backed by official current-format material. If a move or item is plausible but not verified in-repo or live, label it `unverified` or use provisional set direction instead of presenting it as confirmed.
+Use `officially verified` only for legality claims backed by official current-format material. Species eligibility may come from the official roster; item and move legality require separate evidence. If a move or item is plausible but not verified in-repo or live, label it `unverified` or use provisional set direction instead of presenting it as confirmed.
 
 ## Skill Usage
 

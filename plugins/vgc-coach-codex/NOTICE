@@ -1,0 +1,14 @@
+VGC Coach
+
+This repository is a fork of VGC Coach, originally published at
+https://github.com/NoahJenkins/vgc-coach under the Apache License 2.0.
+
+Upstream author: Noah Jenkins.
+
+Source endpoint and TTL research was informed by VGC-Reporter
+(https://github.com/felipesuarez-dev/VGC-Reporter), licensed under the MIT
+License. No VGC-Reporter source code is vendored in this repository.
+
+The bundled Sectigo Public Server Authentication CA DV R36 certificate is a
+public intermediate certificate published by Sectigo for TLS chain completion.
+Its SHA-256 fingerprint is pinned in tools/fetch_labmaus.py.

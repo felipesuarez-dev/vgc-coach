@@ -10,9 +10,9 @@
     }
   },
   "format_provenance": {
-    "source_url": "https://www.pokemon.com/uk/news/get-ready-for-regulation-set-m-c-in-pokemon-champions",
+    "source_url": "https://news.pokemon-home.com/en/page/816.html",
     "source_title": "Regulation Set M-C",
-    "verified_on": "2026-09-13"
+    "verified_on": "2026-11-25"
   },
   "target_mons": ["Sableye"],
   "target_strategy": "anti-meta balance with one-turn tempo control",

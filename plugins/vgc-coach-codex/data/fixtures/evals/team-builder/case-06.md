@@ -10,6 +10,9 @@ Checks:
 
 - includes `Build Goal` followed immediately by `Evidence and Confidence`
 - verifies or labels the active regulation and mechanics before team details
+- includes a `Legality Ledger` or an explicit species/item/move/mechanics legality summary
+- checks the requested and supporting species against the current official roster
+- does not treat roster membership as proof that Life Orb or old moves are legal
 - does not present `Life Orb` as confirmed legal unless current Champions item legality was actually verified
 - does not provide exact locked four-move sets for slots whose move legality was not verified
 - uses provisional item or move direction when legality is unverified
@@ -21,4 +24,5 @@ Failure triggers:
 
 - presents legacy item legality as confirmed without current Champions evidence
 - gives exact confirmed four-move sets where move legality was not verified
+- uses the roster to imply item or move legality
 - skips the evidence/confidence summary before recommending slots

@@ -1,90 +1,91 @@
 # OpenCode Runtime
 
-OpenCode support in this repo is an additive adapter over the same shared skill packages used by Codex and Claude Code.
+OpenCode support in this repo covers OpenCode V1 and OpenCode V2 (TUI, desktop, and web). Both use the same shared skill packages; only the loading mechanism differs.
 
 ## Loading Model
 
 - Repo-wide product and workflow rules still live in `AGENTS.md`.
-- `opencode.json` should load this file through the `instructions` field so OpenCode gets runtime-specific behavior without duplicating the shared contract.
+- `opencode.json` loads `docs/runtime/opencode.md` through the `instructions` field.
 - OpenCode scans `.opencode/skills/`, `.claude/skills/`, and `.agents/skills/` for project skills.
-- Because this repo keeps Codex and Claude discovery shims with the same shared `vgc-*` names, OpenCode support should expose unique wrapper names under `.opencode/skills/opencode-vgc-*/`.
-- Each OpenCode wrapper should point the model back to the canonical shared files under `skills/` and `docs/` instead of duplicating coaching logic.
-- `opencode.json` should deny the shared `vgc-*` names and allow only `opencode-vgc-*` so OpenCode has one unambiguous VGC skill namespace in this repo.
-- The installable OpenCode package lives under `plugins/vgc-coach-opencode/`, and the repo-root `package.json` exposes it for git-based plugin installs.
+- The repo keeps unique wrapper names under `.opencode/skills/opencode-vgc-*/` so the project wrappers do not collide with the packaged `vgc-*` names.
+- `opencode.json` denies the shared `vgc-*` names and allows only `opencode-vgc-*` for repo-local source work.
+- The installable package lives under `plugins/vgc-coach-opencode/`.
+
+## V1 Install
+
+OpenCode 1.x loads the generated plugin from `opencode.json`:
+
+```json
+{
+  "plugin": ["vgc-coach-opencode@git+https://github.com/felipesuarez-dev/vgc-coach.git"]
+}
+```
+
+Restart OpenCode 1.x after editing the config.
+
+## V2, Desktop, and Web Install
+
+OpenCode V2 uses the `skills` field:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": ["/absolute/path/to/vgc-coach/plugins/vgc-coach-opencode/skills"]
+}
+```
+
+The TUI, desktop app, and web UI all read the same global config. V2 reloads configuration without a restart; use `/reload` if the skill list does not refresh.
+
+The web UI is served by the same V2 server:
+
+```bash
+opencode pair
+```
+
+Open the printed link, or use the address from `opencode service status`. A standalone server can be started with:
+
+```bash
+opencode serve --hostname 0.0.0.0 --port 4096
+```
+
+For HTTP checks against a standalone server, V2 uses Basic auth with the username `opencode` and the server password:
+
+```bash
+curl -u opencode:<password> http://127.0.0.1:4096/api/skill
+curl -u opencode:<password> -X POST http://127.0.0.1:4096/api/location/reload
+```
+
+Do not add the password to the repository.
 
 ## Adapter Rules
 
 - Reuse `AGENTS.md`, `skills/`, `data/fixtures/`, and `data/rubrics/`.
 - Keep OpenCode-specific behavior in this file, `.opencode/commands/`, and thin `.opencode/skills/opencode-vgc-*/` wrappers only.
-- Keep `.opencode/skills/` as an OpenCode discovery layer, not a second skill implementation tree.
-- Avoid OpenCode-only forks of the coaching logic unless a real runtime limitation forces them.
-
-## Expected Invocation Model
-
-- OpenCode should be able to discover the project skills from `.opencode/skills/opencode-vgc-*/`.
-- Project slash commands under `.opencode/commands/` should provide a first-class path for the five MVP skills:
-  - `/vgc-meta-research`
-  - `/vgc-team-builder`
-  - `/vgc-team-audit`
-  - `/vgc-lead-planner`
-  - `/vgc-battle-review`
-- Those commands should route through the `opencode-vgc-*` wrappers, which then read the shared skill packages and references directly from `skills/` and `docs/`.
-- Natural-language requests should still be able to trigger the same shared skills when the descriptions match.
-- `vgc-team-builder` should stay lightweight unless the user explicitly asks for battle-ready or spread-bearing output.
+- Keep `.opencode/skills/` as a discovery layer, not a second skill implementation tree.
+- Avoid OpenCode-only forks of the coaching logic unless a real runtime limitation forces it.
+- The V1 plugin shim is not used by V2. Do not present it as a V2 install path.
 
 ## Current-Info And Sourcing Rules
 
 - Current format, legality, and meta claims are time-sensitive; verify them live before presenting them as current.
 - Prefer official rules sources over community sources.
 - Use community sources for usage, trends, and archetype interpretation only after format truth is locked.
-- Use absolute dates when clarifying “current” claims.
+- Use absolute dates when clarifying "current" claims.
 - Distinguish sourced facts from inference explicitly.
+- Use `docs/skills/shared/references/current-regulation.md`; do not link a dated regulation note from a skill.
 
 ## Tooling Boundary
 
-- `vgc-calcs-assistant` exact-browser support still depends on local `agent-browser` plus `python3 tools/browser_damage_calc.py`.
-- In `battle-ready` mode, `vgc-team-builder` should use live common cores and recent top teams as benchmark inputs, then hand narrow benchmark questions to `vgc-calcs-assistant`.
-- In OpenCode MVP, exact damage, KO, and survival support is only acceptable when that local tool chain is available and working.
-- If OpenCode cannot use the local browser/tool path because of missing install, missing permissions, or runtime mismatch, say the exact path is blocked or unverified and fall back to assumption-framed guidance.
+- `vgc-calcs-assistant` exact-browser support depends on local `agent-browser` plus `python3 tools/browser_damage_calc.py`.
+- In `battle-ready` mode, `vgc-team-builder` uses live cores and recent top teams as benchmark inputs, then hands narrow benchmark questions to `vgc-calcs-assistant`.
+- Exact damage, KO, and survival support is only acceptable when the local tool chain is available and working.
+- If OpenCode cannot use the local browser/tool path, say the exact path is blocked or unverified and fall back to assumption-framed guidance.
 - Speed checks remain assumption-framed unless a verified exact backend is added later.
-- `export-ready` output should still downgrade when named items or moves are not verified.
+- `export-ready` output must downgrade when named items or moves are not verified.
 
 ## Validation Expectations
 
-- When changing shared skill logic, validate against the existing fixed eval cases and rubrics.
-- For OpenCode-specific support changes, at minimum verify project command discovery, wrapper-skill discovery through `.opencode/skills/opencode-vgc-*/`, shared file reads from `skills/` and `docs/`, and one representative command invocation.
-- Use [OpenCode Team Builder Live Checklist](../evals/opencode-team-builder-live-checklist.md) when pressure-testing `vgc-team-builder` behavior in OpenCode.
-
-## Install
-
-Add the repo as a git-installed plugin in `opencode.json`:
-
-```json
-{
-  "plugin": ["vgc-coach-opencode@git+https://github.com/NoahJenkins/vgc-coach.git"]
-}
-```
-
-Restart OpenCode after editing the config.
-
-## Update
-
-If you keep the install unpinned, OpenCode refreshes the plugin when it reinstalls from the git source on restart.
-
-If you pin to a release tag, update the ref and restart:
-
-```json
-{
-  "plugin": ["vgc-coach-opencode@git+https://github.com/NoahJenkins/vgc-coach.git#v0.2.0"]
-}
-```
-
-## Verify
-
-Use the native skill tool to confirm the plugin-registered skills are visible:
-
-```text
-use skill tool to list skills
-```
-
-You should see the VGC Coach plugin namespace and its generated skills after restart.
+- When changing shared skill logic, validate against the fixed eval cases and rubrics.
+- For OpenCode-specific support changes, verify project command discovery, wrapper-skill discovery, shared file reads, and one representative command invocation.
+- For V2 and web, verify the `vgc-*` skills appear in the skill list.
+- Use [OpenCode Team Builder Live Checklist](../evals/opencode-team-builder-live-checklist.md) when pressure-testing `vgc-team-builder`.

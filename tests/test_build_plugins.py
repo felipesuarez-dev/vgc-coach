@@ -136,7 +136,9 @@ class BuildPluginsTests(unittest.TestCase):
 
         self.assertIn("python3 tools/install_codex_plugin.py", codex_doc)
         self.assertIn("claude plugin install vgc-coach-claude@vgc-coach", claude_doc)
-        self.assertIn("vgc-coach-opencode@git+https://github.com/NoahJenkins/vgc-coach.git", opencode_doc)
+        self.assertIn("vgc-coach-opencode@git+https://github.com/felipesuarez-dev/vgc-coach.git", opencode_doc)
+        self.assertIn('"skills"', opencode_doc)
+        self.assertIn("api/location/reload", opencode_doc)
 
     def test_release_notes_match_generated_version_section(self):
         manifest = self.module.load_manifest()

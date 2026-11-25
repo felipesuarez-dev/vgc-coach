@@ -160,7 +160,7 @@ function App() {
               ))}
               <a
                 className="site-nav-link-external"
-                href="https://github.com/NoahJenkins/vgc-coach"
+                href="https://github.com/felipesuarez-dev/vgc-coach"
                 aria-label="View the VGC Coach repository on GitHub"
                 onClick={closeMobileNav}
                 {...externalLinkProps}
@@ -187,7 +187,7 @@ function App() {
             </button>
             <a
               className="button button-ghost header-repo-link"
-              href="https://github.com/NoahJenkins/vgc-coach"
+              href="https://github.com/felipesuarez-dev/vgc-coach"
               aria-label="View the VGC Coach repository on GitHub"
               {...externalLinkProps}
             >
@@ -735,7 +735,7 @@ function App() {
             <div className="cta-actions">
               <a
                 className="button button-primary"
-                href="https://github.com/NoahJenkins/vgc-coach"
+                href="https://github.com/felipesuarez-dev/vgc-coach"
                 aria-label="Open the VGC Coach GitHub repository"
                 {...externalLinkProps}
               >
@@ -743,7 +743,7 @@ function App() {
               </a>
               <a
                 className="button button-secondary"
-                href="https://github.com/NoahJenkins/vgc-coach/blob/main/CONTRIBUTING.md"
+                href="https://github.com/felipesuarez-dev/vgc-coach/blob/main/CONTRIBUTING.md"
                 aria-label="Open the VGC Coach contribution guide on GitHub"
                 {...externalLinkProps}
               >

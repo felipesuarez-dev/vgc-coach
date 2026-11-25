@@ -467,6 +467,60 @@ class FormatFreshnessTests(unittest.TestCase):
         self.assertIn("historical regulation reference", issues[0])
         self.assertIn("champions-reg-m-b-legality.md", issues[0])
 
+    def test_current_regulation_wrapper_must_point_to_the_current_note(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_designated_artifacts(root, current_end="2026-09-09T01:59:00Z")
+            wrapper = root / "docs/skills/shared/references/current-regulation.md"
+            wrapper.write_text(
+                "Read `docs/skills/shared/references/champions-reg-m-a-legality.md`.\n"
+            )
+
+            issues = self.module.find_expired_current_artifacts(
+                root, now=datetime(2026, 8, 6, 12, tzinfo=timezone.utc)
+            )
+
+        self.assertEqual(len(issues), 1)
+        self.assertIn("current-regulation.md", issues[0])
+        self.assertIn("champions-reg-m-b-legality.md", issues[0])
+
+    def test_current_regulation_wrapper_accepts_the_current_note(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_designated_artifacts(root, current_end="2026-09-09T01:59:00Z")
+            wrapper = root / "docs/skills/shared/references/current-regulation.md"
+            wrapper.write_text(
+                "Read `docs/skills/shared/references/champions-reg-m-b-legality.md`.\n"
+            )
+
+            issues = self.module.find_expired_current_artifacts(
+                root, now=datetime(2026, 8, 6, 12, tzinfo=timezone.utc)
+            )
+
+        self.assertEqual(issues, ())
+
+    def test_upcoming_designation_does_not_expire(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_designated_artifacts(root, current_end="2026-09-09T01:59:00Z")
+            upcoming = root / "docs/skills/shared/references/champions-reg-m-c-legality.md"
+            upcoming.write_text(
+                "---\n"
+                "temporal_status: upcoming\n"
+                "regulation_id: regulation-m-c\n"
+                "active_window:\n"
+                "  start: '2027-01-01T00:00:00Z'\n"
+                "  end: '2027-03-01T00:00:00Z'\n"
+                "---\n"
+                "# Upcoming reference\n"
+            )
+
+            issues = self.module.find_expired_current_artifacts(
+                root, now=datetime(2026, 8, 6, 12, tzinfo=timezone.utc)
+            )
+
+        self.assertEqual(issues, ())
+
     def test_regulation_bearing_paths_require_temporal_status(self):
         scenarios = {
             "registry": (
@@ -584,7 +638,7 @@ class FormatFreshnessTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     payload["format_provenance"]["source_url"],
-                    "https://www.pokemon.com/uk/news/get-ready-for-regulation-set-m-c-in-pokemon-champions",
+                    "https://news.pokemon-home.com/en/page/816.html",
                 )
 
     def test_checked_in_battle_state_example_is_a_current_designation(self):

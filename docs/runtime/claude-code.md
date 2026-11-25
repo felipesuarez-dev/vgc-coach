@@ -53,7 +53,7 @@ Claude Code support in this repo is a thin adapter over the same shared skill pa
 Add the repo marketplace, then install the packaged plugin:
 
 ```bash
-claude plugin marketplace add NoahJenkins/vgc-coach --sparse .claude-plugin plugins
+claude plugin marketplace add felipesuarez-dev/vgc-coach --sparse .claude-plugin plugins
 claude plugin install vgc-coach-claude@vgc-coach
 ```
 

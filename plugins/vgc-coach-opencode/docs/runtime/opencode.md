@@ -12,6 +12,7 @@ This plugin package is a generated, self-contained distribution of VGC Coach.
 - `data/schemas/battle-state-v1.schema.json` defines structured battle evidence
 - `tools/ingest_battle_state.py` validates and normalizes battle-state JSON locally
 - `tools/browser_damage_calc.py` provides the optional exact damage helper
+- `tools/fetch_labmaus.py` fetches LabMaus JSON with the bundled intermediate certificate and required headers
 
 ## Notes
 

@@ -24,6 +24,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = Path("docs/skills/shared/references/live-source-registry.yaml")
 REFERENCE_ROOT = Path("docs/skills/shared/references")
+CURRENT_REFERENCE_PATH = REFERENCE_ROOT / "current-regulation.md"
 SNAPSHOT_ROOT = Path("data/snapshots")
 FIXTURE_ROOT = Path("data/fixtures")
 OPENCODE_SKILL_ROOT = Path(".opencode/skills")
@@ -91,8 +92,8 @@ def _designation(
                 f"{label}: regulation-bearing artifacts require temporal_status"
             )
         return None
-    if status not in {"current", "historical"}:
-        raise ValueError(f"{label}: temporal_status must be current or historical")
+    if status not in {"current", "upcoming", "historical"}:
+        raise ValueError(f"{label}: temporal_status must be current, upcoming, or historical")
 
     window: Any = payload
     for component in window_path:
@@ -233,18 +234,28 @@ def _runtime_reference_issues(repo_root: Path) -> tuple[str, ...]:
     )
 
     issues: list[str] = []
-    wrapper_root = repo_root / OPENCODE_SKILL_ROOT
-    if not wrapper_root.exists():
-        return ()
     reference_pattern = re.compile(r"champions-reg-[a-z0-9-]+-legality\.md")
-    for path in sorted(wrapper_root.glob("*/SKILL.md")):
-        for reference in sorted(set(reference_pattern.findall(path.read_text()))):
-            if reference != expected_name:
-                relative = path.relative_to(repo_root).as_posix()
-                issues.append(
-                    f"{relative} routes current coaching to historical regulation "
-                    f"reference {reference}; expected {expected_name}"
-                )
+
+    current_reference = repo_root / CURRENT_REFERENCE_PATH
+    if current_reference.exists():
+        references = sorted(set(reference_pattern.findall(current_reference.read_text())))
+        if references != [expected_name]:
+            issues.append(
+                f"{CURRENT_REFERENCE_PATH.as_posix()} routes current coaching to "
+                f"{references or 'no legality reference'}; expected {expected_name}"
+            )
+
+    for wrapper_root in (repo_root / "skills", repo_root / OPENCODE_SKILL_ROOT):
+        if not wrapper_root.exists():
+            continue
+        for path in sorted(wrapper_root.glob("*/SKILL.md")):
+            for reference in sorted(set(reference_pattern.findall(path.read_text()))):
+                if reference != expected_name:
+                    relative = path.relative_to(repo_root).as_posix()
+                    issues.append(
+                        f"{relative} routes current coaching to historical regulation "
+                        f"reference {reference}; expected {expected_name}"
+                    )
     return tuple(issues)
 
 

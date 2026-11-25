@@ -7,7 +7,7 @@ Each snapshot should include:
 - format metadata
 - rules version
 - source provenance
-- `temporal_status` as `current` or `historical`
+- `temporal_status` as `current`, `upcoming`, or `historical`
 - the official regulation `active_window`
 
 Metagame snapshots should additionally include a short freshness window, usage leaders, common cores, and sample teams. Official format-only snapshots may omit usage data when it has not been independently verified.
@@ -18,5 +18,6 @@ Snapshots are dated support and reproducibility artifacts, not a replacement for
 
 - Keep dated snapshots here for reproducible examples and fallback context.
 - For `vgc-meta-research`, snapshots support live work but do not replace live verification for "current" questions.
+- An `upcoming` snapshot records an announced successor before it starts. It must not be used for present-tense coaching.
 - When the active format is moving quickly, keep `fresh_until` short and note that the snapshot is early-meta if applicable.
 - Mark expired regulation snapshots `historical`; `python3 tools/check_format_freshness.py` fails when a `current` designation is past its official end.

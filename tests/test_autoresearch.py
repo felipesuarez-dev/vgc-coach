@@ -660,11 +660,11 @@ class AutoresearchTests(unittest.TestCase):
 
     def test_team_builder_battle_ready_contract_requires_playbook_section(self):
         ctx = load_skill_context(get_skill_config("vgc-team-builder"))
-        self.assertIn("10. `Playbook`", ctx.skill_text)
-        self.assertIn("11. `Why Each Slot Exists`", ctx.skill_text)
-        self.assertIn("12. `Matchup Notes`", ctx.skill_text)
-        self.assertIn("13. `Weaknesses and Next Refinements`", ctx.skill_text)
-        self.assertIn("14. `Export Status`", ctx.skill_text)
+        self.assertIn("12. `Playbook`", ctx.skill_text)
+        self.assertIn("14. `Why Each Slot Exists`", ctx.skill_text)
+        self.assertIn("15. `Matchup Notes`", ctx.skill_text)
+        self.assertIn("16. `Weaknesses and Next Refinements`", ctx.skill_text)
+        self.assertIn("17. `Export Status`", ctx.skill_text)
         self.assertIn("at least 2 distinct lead pairs", ctx.skill_text)
 
     def test_team_builder_battle_ready_rubric_and_fixture_cover_playbook(self):

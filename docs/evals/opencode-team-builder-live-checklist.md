@@ -103,12 +103,17 @@ Ask these before accepting the output:
 
 ## Supporting Artifacts
 
-- `docs/skills/shared/references/champions-reg-m-c-legality.md`
+- `docs/skills/shared/references/current-regulation.md`
 - `docs/skills/shared/references/live-source-map.md`
 - `docs/skills/shared/references/verification-packet.md`
+- `docs/skills/shared/references/battle-ready-legality-ledger.md`
 - `docs/skills/vgc-team-builder/references/build-principles.md`
+- `docs/skills/vgc-team-builder/references/meta-and-core-grounding.md`
+- `docs/skills/vgc-team-builder/references/synergy-audit.md`
 - `skills/vgc-team-builder/SKILL.md`
 - `data/rubrics/team-builder-rubric.md`
 - `data/fixtures/evals/team-builder/case-01.md`
 - `data/fixtures/evals/team-builder/case-04.md`
 - `data/snapshots/champions-reg-m-c-2026-10-30.json`
+
+For battle-ready prompts, also require `Legality Ledger`, `Meta Snapshot and Fallbacks`, `Synergy and Matchup Audit`, and `Export Status`.

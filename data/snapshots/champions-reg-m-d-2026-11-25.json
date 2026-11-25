@@ -1,0 +1,33 @@
+{
+  "snapshot_id": "reg-m-d-2026-11-25",
+  "temporal_status": "upcoming",
+  "generated_at": "2026-11-25T02:00:15Z",
+  "verified_on": "2026-11-25",
+  "format": {
+    "game": "pokemon-champions",
+    "battle_mode": "doubles",
+    "regulation_id": "regulation-m-d",
+    "rules_version": "2026-12-02",
+    "mechanics": ["mega-evolution"],
+    "active_window": {
+      "start": "2026-12-02T02:00:00Z",
+      "end": "2027-03-03T01:59:00Z"
+    }
+  },
+  "sources": [
+    {
+      "source_id": "regulation-set-m-d",
+      "kind": "official",
+      "label": "Regulation Set M-D announcement",
+      "url": "https://news.pokemon-home.com/en/page/878.html",
+      "fetched_at": "2026-11-25T02:00:15Z"
+    }
+  ],
+  "fresh_until": "2026-12-09T02:00:00Z",
+  "notes": [
+    "Upcoming regulation: prepare only; do not use for present-tense coaching before 2026-12-02T02:00:00Z.",
+    "The official page says full details will be announced later and does not publish the eligible roster yet.",
+    "The page names Heatran, Dondozo, and Tatsugiri as newly appearing examples, and Mega Heatran and Mega Tatsugiri as newly allowed Mega Evolutions.",
+    "No item, move, ability, timer, or held-item rule change is stated."
+  ]
+}

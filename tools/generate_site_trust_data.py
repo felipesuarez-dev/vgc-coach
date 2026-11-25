@@ -88,7 +88,12 @@ def collect_trust_facts(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
         role_sources = [
             source
             for source in sources
-            if source["role"] == role and source["required_for_minimum_stack"]
+            if source["role"] == role
+            and source["required_for_minimum_stack"]
+            and (
+                source["role"] not in {"official_regulation", "official_roster"}
+                or source.get("temporal_status") == "current"
+            )
         ]
         required_count = registry["minimum_stack"][stack_key]
         if len(role_sources) < required_count:

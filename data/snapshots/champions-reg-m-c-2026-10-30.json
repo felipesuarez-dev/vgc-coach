@@ -2,7 +2,7 @@
   "snapshot_id": "champions-reg-m-c-2026-10-30",
   "temporal_status": "current",
   "generated_at": "2026-10-30T00:30:00Z",
-  "verified_on": "2026-10-30",
+  "verified_on": "2026-11-25",
   "format": {
     "game": "pokemon-champions",
     "battle_mode": "doubles",
@@ -28,15 +28,16 @@
       "source_id": "regulation-set-m-c",
       "kind": "official",
       "label": "Regulation Set M-C",
-      "url": "https://www.pokemon.com/uk/news/get-ready-for-regulation-set-m-c-in-pokemon-champions",
-      "fetched_at": "2026-10-30T00:30:00Z"
+      "url": "https://news.pokemon-home.com/en/page/816.html",
+      "fetched_at": "2026-11-25T02:00:00Z"
     }
   ],
   "notes": [
-    "The official M-C announcement confirms the active window and says Pokémon eligible in prior regulation sets remain eligible.",
-    "The announcement names six added Mega Evolutions: Mega Salamence, Mega Golisopod, Mega Baxcalibur, and the Z Mega Evolutions Mega Absol Z, Mega Garchomp Z, and Mega Lucario Z.",
-    "The announcement says 24 Pokémon are newly available for battle and names only Rillaboom; the remaining 23 are not listed on the page.",
-    "The announcement does not explain how Z Mega Evolutions differ mechanically from other Mega Evolutions, and names no item, move, ability, or timer changes.",
+    "The official M-C page confirms the active window and says only Pokemon displayed in the Eligible Pokemon roster are eligible.",
+    "The page names six added Mega Evolutions: Mega Absol Z, Mega Salamence, Mega Garchomp Z, Mega Lucario Z, Mega Golisopod, and Mega Baxcalibur.",
+    "The page says duplicate held items are not allowed.",
+    "The page lists total time 20 minutes, player time 7 minutes, turn time 45 seconds, and preview time 90 seconds.",
+    "The page does not explain how Z Mega Evolutions differ mechanically from other Mega Evolutions.",
     "Recheck the official source live before present-tense coaching or exact species, move, ability, item, or mechanic claims."
   ]
 }

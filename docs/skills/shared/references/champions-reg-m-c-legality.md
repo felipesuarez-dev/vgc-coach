@@ -18,24 +18,28 @@ Use this dated note as a supporting reference after rechecking the official anno
 
 ## Verified Transition
 
-- Pokémon eligible in previous regulation sets remain eligible.
-- The official announcement adds six Mega Evolutions:
-  - Mega Salamence, Mega Golisopod, and Mega Baxcalibur
-  - the Z Mega Evolutions Mega Absol Z, Mega Garchomp Z, and Mega Lucario Z
-- The official announcement says 24 Pokémon are newly available for battle. It names only Rillaboom; the other 23 are not listed on the page.
+- The official page names six Mega Evolutions as newly allowed:
+  - Mega Absol Z, Mega Salamence, Mega Garchomp Z
+  - Mega Lucario Z, Mega Golisopod, Mega Baxcalibur
+- Duplicate held items are not allowed.
+- Timers: total time 20 minutes, player time 7 minutes, turn time 45 seconds, preview time 90 seconds.
 
 ## Not Stated By The Official Source
 
 - How Z Mega Evolutions differ mechanically from other Mega Evolutions.
-- The full list of the 24 newly available Pokémon.
-- Any item, move, ability, or timer change.
+- The full list of newly available Pokemon beyond the eligible roster page.
+- Any move, ability, or held-item change beyond the duplicate-item rule.
 
 Treat these as unverified. Do not infer species, move, ability, held-item, or mechanic legality beyond what the current official source explicitly supports.
 
 ## Source Basis
 
-- official regulation announcement: `https://www.pokemon.com/uk/news/get-ready-for-regulation-set-m-c-in-pokemon-champions`
-- page published: September 2, 2026
-- last rechecked: October 30, 2026
+- official regulation announcement: `https://news.pokemon-home.com/en/page/816.html`
+- page published: September 9, 2026
+- last rechecked: November 25, 2026
+- official eligible roster: `https://web-view.app.pokemonchampions.jp/battle/pages/events/rs178713870219xeaaio/en/pokemon.html`
+- roster entries observed on November 24, 2026: 262
+
+The official roster verifies species eligibility only. It does not verify held items, moves, abilities, or mechanics. Keep those claims in the legality ledger and label them unverified when they are not independently supported.
 
 This reference expires with the official M-C window. Recheck the replacement regulation before coaching after December 2, 2026 at 01:59 UTC.

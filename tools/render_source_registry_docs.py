@@ -26,10 +26,14 @@ GENERATED_COMMENT = (
 
 VALID_ROLES = {
     "official_regulation",
+    "official_roster",
+    "official_calendar",
+    "official_results",
     "official_transition",
     "tournament_meta",
     "broader_meta",
     "supporting_sets",
+    "event_standings",
     "editorial_context",
 }
 VALID_SOURCE_KINDS = {
@@ -38,14 +42,20 @@ VALID_SOURCE_KINDS = {
     "supporting",
     "editorial",
 }
-VALID_TEMPORAL_STATUSES = {"current", "historical"}
+VALID_TEMPORAL_STATUSES = {"current", "upcoming", "historical"}
 VALID_CLAIM_TYPES = {
     "legality",
     "mechanics",
     "format_dates",
     "held_item_rules",
     "timers",
+    "roster_legality",
     "event_timing",
+    "event_schedule",
+    "event_results",
+    "standings",
+    "team_lists",
+    "decklists",
     "transition_context",
     "tournament_usage",
     "top_teams",
@@ -69,6 +79,11 @@ MINIMUM_STACK_ROLE_MAP = {
     "tournament_meta": "tournament_meta",
     "broader_meta": "broader_meta",
 }
+TEAM_BUILD_STACK_KEYS = ("official_roster",)
+TEAM_BUILD_STACK_ROLE_MAP = {
+    "official_roster": "official_roster",
+}
+OFFICIAL_REGULATION_ROLES = {"official_regulation", "official_roster"}
 VALID_EVIDENCE_FIELDS = {
     "source_id",
     "source_url",
@@ -81,9 +96,20 @@ VALID_EVIDENCE_FIELDS = {
     "freshness_note",
 }
 ROLE_GROUPS = (
-    ("Official Format Sources", ("official_regulation", "official_transition")),
+    (
+        "Official Sources",
+        (
+            "official_regulation",
+            "official_roster",
+            "official_calendar",
+            "official_results",
+            "official_transition",
+        ),
+    ),
     ("Community Meta Sources", ("tournament_meta", "broader_meta")),
-    ("Supporting Sources", ("supporting_sets", "editorial_context")),
+    ("Supporting Set Sources", ("supporting_sets",)),
+    ("Event and Standings Sources", ("event_standings",)),
+    ("Editorial Sources", ("editorial_context",)),
 )
 
 
@@ -140,8 +166,18 @@ def _validate_freshness(value: Any, *, label: str, role: str) -> dict[str, Any]:
         raise ValueError(f"{label}.max_age_days must be >= 0")
 
     policy = _require_nonempty_string(raw.get("policy"), label=f"{label}.policy")
-    if role in {"tournament_meta", "broader_meta", "supporting_sets"} and max_age_days > 14:
-        raise ValueError(f"{label}.max_age_days must be <= 14 for current-meta sources")
+    if max_age_days > 30:
+        raise ValueError(f"{label}.max_age_days must be <= 30")
+    if role in {
+        "tournament_meta",
+        "broader_meta",
+        "supporting_sets",
+        "official_roster",
+        "official_calendar",
+        "official_results",
+        "event_standings",
+    } and max_age_days > 14:
+        raise ValueError(f"{label}.max_age_days must be <= 14 for current-source roles")
 
     return {
         "max_age_days": max_age_days,
@@ -179,6 +215,21 @@ def validate_registry(payload: Any) -> dict[str, Any]:
         minimum_stack[key] = _require_int(minimum_stack_raw.get(key), label=f"minimum_stack.{key}")
         if minimum_stack[key] < 0:
             raise ValueError(f"minimum_stack.{key} must be >= 0")
+
+    team_build_stack_raw = root.get("team_build_stack")
+    team_build_stack: dict[str, int] = {}
+    if team_build_stack_raw is not None:
+        team_build_stack_mapping = _require_mapping(
+            team_build_stack_raw, label="team_build_stack"
+        )
+        for key in TEAM_BUILD_STACK_KEYS:
+            if key not in team_build_stack_mapping:
+                continue
+            team_build_stack[key] = _require_int(
+                team_build_stack_mapping.get(key), label=f"team_build_stack.{key}"
+            )
+            if team_build_stack[key] < 0:
+                raise ValueError(f"team_build_stack.{key} must be >= 0")
 
     sources: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
@@ -265,7 +316,7 @@ def validate_registry(payload: Any) -> dict[str, Any]:
                 label=f"sources[{index}].fallback_if_unavailable",
             ),
         }
-        if role == "official_regulation":
+        if role in OFFICIAL_REGULATION_ROLES:
             normalized["regulation_id"] = _require_nonempty_string(
                 item.get("regulation_id"),
                 label=f"sources[{index}].regulation_id",
@@ -288,16 +339,56 @@ def validate_registry(payload: Any) -> dict[str, Any]:
     if sorted(source["priority"] for source in sources) != list(range(1, len(sources) + 1)):
         raise ValueError("source priorities must be contiguous and start at 1")
 
+    current_official = [
+        source
+        for source in sources
+        if source["role"] == "official_regulation"
+        and source.get("temporal_status") == "current"
+    ]
+    if len(current_official) != 1:
+        raise ValueError("registry must configure exactly one current official_regulation source")
+
+    current_roster = [
+        source
+        for source in sources
+        if source["role"] == "official_roster"
+        and source.get("temporal_status") == "current"
+    ]
+    if team_build_stack.get("official_roster", 0) > 0 and len(current_roster) != 1:
+        raise ValueError("registry must configure exactly one current official_roster source")
+
+    def counts_toward_stack(source: dict[str, Any]) -> bool:
+        if source["role"] in OFFICIAL_REGULATION_ROLES:
+            return source.get("temporal_status") == "current"
+        return True
+
     for stack_key, role in MINIMUM_STACK_ROLE_MAP.items():
         required_count = minimum_stack[stack_key]
         available_count = sum(
             1
             for source in sources
-            if source["role"] == role and source["required_for_minimum_stack"]
+            if source["role"] == role
+            and source["required_for_minimum_stack"]
+            and counts_toward_stack(source)
         )
         if available_count < required_count:
             raise ValueError(
                 f"minimum_stack.{stack_key} requires {required_count} sources, "
+                f"but only {available_count} required {role} sources are configured"
+            )
+
+    for stack_key, role in TEAM_BUILD_STACK_ROLE_MAP.items():
+        required_count = team_build_stack.get(stack_key, 0)
+        available_count = sum(
+            1
+            for source in sources
+            if source["role"] == role
+            and source["required_for_minimum_stack"]
+            and counts_toward_stack(source)
+        )
+        if available_count < required_count:
+            raise ValueError(
+                f"team_build_stack.{stack_key} requires {required_count} sources, "
                 f"but only {available_count} required {role} sources are configured"
             )
 
@@ -306,6 +397,7 @@ def validate_registry(payload: Any) -> dict[str, Any]:
         "summary": summary,
         "usage": usage,
         "minimum_stack": minimum_stack,
+        "team_build_stack": team_build_stack,
         "sources": sorted(sources, key=lambda item: item["priority"]),
     }
 
@@ -325,7 +417,7 @@ def _render_source(source: dict[str, Any]) -> list[str]:
         f"re-check within {source['freshness']['max_age_days']} days; "
         f"{source['freshness']['policy']}"
     )
-    if source["role"] == "official_regulation":
+    if source["role"] in OFFICIAL_REGULATION_ROLES:
         lines.append(f"Regulation ID: `{source['regulation_id']}`")
         lines.append(f"Temporal status: `{source['temporal_status']}`")
         lines.append(
@@ -349,7 +441,10 @@ def _render_source(source: dict[str, Any]) -> list[str]:
         lines.append(f"- {item}")
     lines.append("")
     if source["required_for_minimum_stack"]:
-        lines.append("Counts toward the recommended minimum live stack.")
+        if source["role"] == "official_roster":
+            lines.append("Counts toward the recommended team-build legality stack.")
+        else:
+            lines.append("Counts toward the recommended minimum live stack.")
         lines.append("")
     lines.append("Fallback if unavailable:")
     lines.append("")
@@ -392,6 +487,20 @@ def render_markdown(registry: dict[str, Any]) -> str:
             "",
         ]
     )
+    team_build_stack = registry.get("team_build_stack") or {}
+    if team_build_stack.get("official_roster", 0) > 0:
+        lines.extend(
+            [
+                "## Recommended Team-Build Legality Stack",
+                "",
+                "For team-building recommendations, also use:",
+                "",
+                f"1. {team_build_stack['official_roster']} current official roster source",
+                "",
+                "The roster verifies species eligibility only. It does not verify items, moves, abilities, or mechanics.",
+                "",
+            ]
+        )
     return "\n".join(lines)
 
 

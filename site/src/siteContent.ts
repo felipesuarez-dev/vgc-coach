@@ -40,7 +40,7 @@ export type CoachingExample = {
   }[];
 };
 
-const repoUrl = "https://github.com/NoahJenkins/vgc-coach";
+const repoUrl = "https://github.com/felipesuarez-dev/vgc-coach";
 const blobUrl = `${repoUrl}/blob/main`;
 
 export const navLinks = [
@@ -247,10 +247,17 @@ export const runtimes: Runtime[] = [
     href: `${blobUrl}/docs/runtime/claude-code.md`,
   },
   {
-    name: "OpenCode",
-    summary: "Secondary support with its own setup notes.",
+    name: "OpenCode V1",
+    summary: "Legacy plugin entry for OpenCode 1.x.",
     notes:
-      "Add the git-install plugin to opencode.json. OpenCode handles the download and wiring automatically on next restart.",
+      "Add the git-install plugin to opencode.json and restart OpenCode 1.x.",
+    href: `${blobUrl}/docs/runtime/opencode.md`,
+  },
+  {
+    name: "OpenCode V2 / Web",
+    summary: "Same shared skills in the TUI, desktop app, and web UI.",
+    notes:
+      "Point the V2 skills field at the generated package, then reload. OpenCode Web uses the same server config as the TUI.",
     href: `${blobUrl}/docs/runtime/opencode.md`,
   },
 ];
@@ -265,15 +272,19 @@ export const principles = [
 export const runtimeInstalls: RuntimeInstall[] = [
   {
     name: "Codex",
-    code: "git clone https://github.com/NoahJenkins/vgc-coach.git\ncd vgc-coach\npython3 tools/build_plugins.py build\npython3 tools/install_codex_plugin.py",
+    code: "git clone https://github.com/felipesuarez-dev/vgc-coach.git\ncd vgc-coach\npython3 tools/build_plugins.py build\npython3 tools/install_codex_plugin.py",
   },
   {
     name: "Claude Code",
-    code: "claude plugin marketplace add NoahJenkins/vgc-coach \\\n  --sparse .claude-plugin plugins\nclaude plugin install vgc-coach-claude@vgc-coach",
+    code: "claude plugin marketplace add felipesuarez-dev/vgc-coach \\\n  --sparse .claude-plugin plugins\nclaude plugin install vgc-coach-claude@vgc-coach",
   },
   {
-    name: "OpenCode",
-    code: '// opencode.json\n{\n  "plugin": [\n    "vgc-coach-opencode@git+https://github.com/NoahJenkins/vgc-coach.git"\n  ]\n}',
+    name: "OpenCode V1",
+    code: '// opencode.json\n{\n  "plugin": [\n    "vgc-coach-opencode@git+https://github.com/felipesuarez-dev/vgc-coach.git"\n  ]\n}',
+  },
+  {
+    name: "OpenCode V2 / Web",
+    code: '// opencode.jsonc\n{\n  "skills": [\n    "/absolute/path/to/vgc-coach/plugins/vgc-coach-opencode/skills"\n  ]\n}',
   },
 ];
 

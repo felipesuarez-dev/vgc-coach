@@ -1,153 +1,165 @@
 # VGC Coach
 
-VGC Coach is an open-source AI coaching assistant for Pokemon VGC (Video Game Championships).
+[English](./README.en.md)
 
-It gives you a set of coaching tools — called *skills* — that run inside AI assistants like Codex, Claude Code, or OpenCode. Ask them in plain English to help with team building, meta research, lead planning, replay review, and other prep work.
+VGC Coach es un asistente de coaching para Pokémon VGC (Video Game Championships). Empaqueta la lógica de coaching en *skills* que funcionan dentro de Codex, Claude Code y OpenCode. Le puedes pedir en lenguaje natural que arme un equipo, revise el meta, planifique leads, audite un equipo o analice una replay.
 
-This is not a standalone app or ladder client. The shared coaching logic lives in this repo, and the easiest way to use it now is through generated plugin packages for Codex, Claude Code, and OpenCode. Developers and contributors can still work directly from source; see [How The Repo Works](#how-the-repo-works).
+No es una app independiente ni un cliente de ladder. La lógica compartida vive en este repositorio y se distribuye como paquetes generados para cada runtime.
 
-## Open Source Status
+## Estado del proyecto
 
-- License: [Apache-2.0](./LICENSE)
-- Contributions: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- Security reporting: [SECURITY.md](./SECURITY.md)
+- Licencia: [Apache-2.0](./LICENSE)
+- Fork de [NoahJenkins/vgc-coach](https://github.com/NoahJenkins/vgc-coach)
+- Contribuciones: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- Seguridad: [SECURITY.md](./SECURITY.md)
+- Documentación: [docs/README.md](./docs/README.md)
 
-## Install As Plugin
+Este fork mantiene la atribución al proyecto original y añade un stack de fuentes verificado, un flujo de transición de regulación y una skill de team building más estricta.
 
-The default end-user path is now generated plugin packages, not repo-local symlink wrappers.
+## Instalación
+
+Los paquetes instalables se generan desde `skills/` y `docs/skills/`. No edites las copias de `plugins/` a mano.
 
 ### Codex
 
-Build and install the generated Codex package into your local marketplace:
-
 ```bash
-git clone https://github.com/NoahJenkins/vgc-coach.git
+git clone https://github.com/felipesuarez-dev/vgc-coach.git
 cd vgc-coach
 python3 tools/build_plugins.py build
 python3 tools/install_codex_plugin.py
 ```
 
-Restart Codex after install.
+Reinicia Codex después de instalar.
 
 ### Claude Code
 
-Add the repo marketplace, then install the packaged Claude plugin:
-
 ```bash
-claude plugin marketplace add NoahJenkins/vgc-coach --sparse .claude-plugin plugins
+claude plugin marketplace add felipesuarez-dev/vgc-coach \
+  --sparse .claude-plugin plugins
 claude plugin install vgc-coach-claude@vgc-coach
 ```
 
-### OpenCode
+Verifica con:
 
-Add the git-installed plugin in `opencode.json`:
+```bash
+claude plugin details vgc-coach-claude@vgc-coach
+```
+
+### OpenCode V1
+
+Agrega el plugin generado en `opencode.json`:
 
 ```json
 {
-  "plugin": ["vgc-coach-opencode@git+https://github.com/NoahJenkins/vgc-coach.git"]
+  "plugin": ["vgc-coach-opencode@git+https://github.com/felipesuarez-dev/vgc-coach.git"]
 }
 ```
 
-Restart OpenCode after editing the config.
+Reinicia OpenCode 1.x después de editar la configuración.
 
-Once installed, ask the AI tool in plain English:
+### OpenCode V2, Desktop y Web
 
-- "Build me a Pokemon Champions team around Mega Blastoise."
-- "Build me a battle-ready Pokemon Champions team around Mega Blastoise with EVs."
-- "Audit this team for bad matchups and weak slots."
-- "Plan my leads into common rain and Trick Room teams."
-- "Review this replay and tell me what mistakes actually mattered."
-- "Give me a current meta snapshot before I build."
+OpenCode V2 usa el campo `skills`, no el plugin V1. Clona el repositorio y apunta `skills` al paquete generado:
 
-Install, update, and verification details live here:
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": ["/absolute/path/to/vgc-coach/plugins/vgc-coach-opencode/skills"]
+}
+```
 
-- [Codex runtime](./docs/runtime/codex.md)
-- [Claude Code runtime](./docs/runtime/claude-code.md)
-- [OpenCode runtime](./docs/runtime/opencode.md)
+La TUI, la app de escritorio y la interfaz web leen la misma configuración global. V2 recarga la configuración sin reiniciar; usa `/reload` si la lista de skills no se actualiza.
 
-## Contribute From Source
-
-If you want to edit skills, docs, evals, or runtime adapters directly, clone the repository and work from source:
+Para abrir la interfaz web:
 
 ```bash
-git clone https://github.com/NoahJenkins/vgc-coach.git
-cd vgc-coach
+opencode pair
 ```
 
-Contributor/source mode still uses the repo-local discovery wrappers:
-
-- **Codex** — `.agents/skills/`
-- **Claude Code** — `.claude/skills/`
-- **OpenCode** — `opencode.json`, `.opencode/skills/`, and `.opencode/commands/`
-
-## Web Site Deployment
-
-The project website lives in `site/` and is deployed on Vercel from that directory.
-
-- Production host: Vercel
-- Vercel Root Directory: `site`
-- Vercel config: [`site/vercel.json`](./site/vercel.json)
-
-When importing to Vercel, set the Root Directory to `site` so the build runs against the Vite app.
-
-## Prerequisites
-
-This repo does not have a root application package to install for contributor/source work. The main requirements are:
-
-- `git` to clone the repository
-- a supported AI tool such as Codex, Claude Code, or OpenCode
-- `python3` if you want to use the optional exact-calc helper at `tools/browser_damage_calc.py`
-
-### Install Core Dependencies
-
-#### macOS (Homebrew)
+Abre el enlace que imprime el comando. Si usas un servidor independiente:
 
 ```bash
-brew install git python node
+opencode serve --hostname 0.0.0.0 --port 4096
 ```
 
-#### Windows (PowerShell with `winget`)
+La guía completa, incluyendo la verificación por HTTP y la recarga del servidor web, está en [docs/installation.md](./docs/installation.md).
 
-```powershell
-winget install --id Git.Git -e
-winget install --id Python.Python.3.12 -e
-winget install --id OpenJS.NodeJS.LTS -e
+## Fuentes
+
+El contrato de fuentes vive en
+[docs/skills/shared/references/live-source-registry.yaml](./docs/skills/shared/references/live-source-registry.yaml)
+y se renderiza en
+[live-source-map.md](./docs/skills/shared/references/live-source-map.md).
+
+Resumen:
+
+- **Oficial**: regulación de Pokémon HOME, roster oficial, calendario y resultados de Championship Series.
+- **Meta de torneo**: infovgc, LabMaus y Limitless.
+- **Meta amplio**: PokeStats y Smogon.
+- **Sets de apoyo**: Pikalytics, PokeBase y Pokepaste.
+- **Eventos y standings**: PokeData.
+- **Editorial**: Victory Road.
+
+ChampionsMeta está retirado (HTTP 402, `DEPLOYMENT_DISABLED`). ChampionsLab queda fuera del stack automático porque sus datos viven en el payload RSC de Next.js.
+
+LabMaus omite su certificado intermedio y exige `Origin`/`Referer`. El repositorio incluye un fetcher que completa la cadena TLS, verifica el hostname y fija el fingerprint del certificado. No uses `curl -k` genérico como solución.
+
+Tabla completa, TTLs, fallbacks y resultados del probe: [docs/sources.md](./docs/sources.md).
+
+## Cómo funciona el team building
+
+El flujo es:
+
+```text
+regulación + roster oficial
+  -> snapshot de meta con fallbacks
+  -> cores reales 2/3/4 y 4/5/6
+  -> un equipo de seis
+  -> legality ledger
+  -> benchmarks acotados
+  -> spreads battle-ready
+  -> playbook derivado de los cores
+  -> auditoría de synergy y matchups
+  -> export gate
 ```
 
-#### Linux (Debian/Ubuntu)
+Puntos importantes:
+
+- Una recomendación `current-field` necesita regulación, roster, una fuente de torneo y una fuente de uso amplio.
+- El roster oficial verifica especies, no objetos, movimientos, habilidades ni mecánicas.
+- Los cores 2/3/4 salen de Limitless; LabMaus publica 4/5/6 y no se le inventan 2/3.
+- Los benchmarks y los spreads se bloquean si la legalidad no está verificada.
+- `export-ready` solo se usa cuando la legalidad y los benchmarks están completos. No se inventa un import string de Champions.
+
+Guía completa: [docs/team-building.md](./docs/team-building.md).
+
+## Regulación actual y M-D
+
+- **M-C** es la regulación actual: `2026-09-09 02:00 UTC` a `2026-12-02 01:59 UTC`.
+- **M-D** está anunciada como `upcoming`: `2026-12-02 02:00 UTC` a `2027-03-03 01:59 UTC`.
+- El roster de M-D todavía no está publicado. No se agrega hasta que la página oficial lo enlace.
+- Las skills usan `current-regulation.md`, no una nota fechada. La transición cambia un solo wrapper.
+- `python3 tools/resolve_regulation.py --check-registry` detecta el estado real y lo compara con el registry.
+- El runbook está en [docs/maintenance/regulation-transition.md](./docs/maintenance/regulation-transition.md).
+
+## Validación
 
 ```bash
-sudo apt update
-sudo apt install -y git python3 python3-venv python3-pip nodejs npm
+python3 tools/validate.py
 ```
 
-For other Linux distributions, install the equivalent packages from your distro's package manager.
+El alcance completo ejecuta tests, render del registry, cobertura offline del probe, freshness de formato, drift de plugins, trust data del sitio y build de producción.
 
-## Optional Setup
+Comandos individuales y probes live: [docs/validation.md](./docs/validation.md).
 
-### Exact Calc Helper
+## Mantenimiento
 
-`vgc-calcs-assistant` can use `python3 tools/browser_damage_calc.py` for exact damage, KO, and survival checks. This requires a local `agent-browser` install (not included in this repo).
+- [Runbook de transición de regulación](./docs/maintenance/regulation-transition.md)
+- [Runbook de Dependabot](./docs/maintenance/dependabot-rebase.md)
 
-`vgc-team-builder` can also use this helper indirectly in its opt-in `battle-ready` mode, where the builder locks one six-mon shell, targets live common cores and recent top teams, and hands narrow benchmark questions to `vgc-calcs-assistant`.
+## Herramientas de coaching
 
-## How The Repo Works
-
-> **For contributors and developers** — this section covers internal architecture. VGC players can skip to [Skill Catalog](#skill-catalog).
-
-- `skills/` is the source of truth for all coaching logic. This is what you edit.
-- `plugins/` contains generated installable packages for Codex, Claude Code, and OpenCode.
-- `.agents/skills/`, `.claude/skills/`, and `.opencode/skills/` are thin wrappers that point AI tools to the shared packages in `skills/`.
-- `docs/skills/` contains examples and references that support the shared skills.
-- `data/fixtures/evals/` and `data/rubrics/` are how skill quality is judged — test cases and scoring rubrics that changes must pass.
-- `docs/runtime/` documents AI-tool-specific behavior without duplicating the underlying skill logic.
-- `.agents/plugins/marketplace.json`, `.claude-plugin/marketplace.json`, and the repo-root `package.json` are generated distribution metadata.
-
-To adapt these skills for your own setup, use `skills/` as the source of truth and keep any AI-tool-specific wrappers minimal.
-
-## Core Coaching Tools
-
-The current focus is five core coaching skills:
+Skills principales:
 
 1. `vgc-meta-research`
 2. `vgc-team-builder`
@@ -155,7 +167,7 @@ The current focus is five core coaching skills:
 4. `vgc-lead-planner`
 5. `vgc-battle-review`
 
-Support skills reinforce that core layer:
+Skills de apoyo:
 
 - `vgc-format-verifier`
 - `vgc-source-verifier`
@@ -163,123 +175,36 @@ Support skills reinforce that core layer:
 - `vgc-opponent-scout`
 - `vgc-practice-journal`
 
-## Skill Catalog
-
-### Core Focus Skills
-
-- `vgc-meta-research`: live Pokemon Champions meta snapshots, trend reads, and anti-meta openings grounded in current sources
-- `vgc-team-builder`: one practical, coherent team around a target mon, strategy, or anti-meta goal; also supports an opt-in `battle-ready` mode with targeted meta cores, benchmark planning, and spreads
-- `vgc-team-audit`: findings-first team reviews that preserve identity unless the identity itself is the problem
-- `vgc-lead-planner`: default leads, matchup branches, preserve targets, and turn-one priorities
-- `vgc-battle-review`: replay or turn-log review that separates real mistakes from variance and hindsight
-
-### Support Skills
-
-- `vgc-format-verifier`: verify legality, regulation, and current-format truth before coaching
-- `vgc-source-verifier`: audit whether a meta, matchup, or rules claim is actually sourced cleanly
-- `vgc-calcs-assistant`: damage, survival, speed, and benchmark framing; exact damage/KO/survival calculations are available when complete inputs and the local browser helper are available; speed comparisons are stated as assumptions unless independently verified; also supports narrow team-builder benchmark handoffs
-- `vgc-opponent-scout`: turn public info into likely shells, techs, and prep notes
-- `vgc-practice-journal`: compress testing notes into next-session changes and follow-up questions
-
-## What's Included Today
-
-The repo already includes:
-
-- Shared coaching skill packages under `skills/`
-- Generated plugin packages under `plugins/`
-- Codex support under `.agents/skills/`
-- Codex marketplace metadata under `.agents/plugins/marketplace.json`
-- Claude Code support under `.claude/skills/`
-- Claude Code marketplace metadata under `.claude-plugin/marketplace.json`
-- OpenCode support under `opencode.json`, `.opencode/skills/`, and `.opencode/commands/`
-- OpenCode git-install metadata in the repo-root `package.json`
-- AI-tool-specific usage notes under `docs/runtime/`
-- Skill examples and references under `docs/skills/`
-- Eval test cases under `data/fixtures/evals/`
-- Scoring rubrics under `data/rubrics/`
-- Meta snapshot history under `data/snapshots/`
-- Helper tools under `tools/`
-- One repository validation entrypoint at `python3 tools/validate.py`
-- Local eval and autoresearch tooling under `tools/eval_skill.py` and `tools/autoresearch.py`
-- Eval artifacts include research-trace metadata and explicit verification state so manual and future automated runs can be judged for signal, not just score
-- Exact damage/KO/survival calc support for `vgc-calcs-assistant` via `python3 tools/browser_damage_calc.py`
-- A versioned, runtime-neutral `battle-state-v1` JSON contract and bounded local normalizer at `python3 tools/ingest_battle_state.py`
-- Opt-in `battle-ready` team building that can use live common cores, recent top teams, and calc-backed benchmark notes
-- A `Regulation Watch` workflow that checks the official Pokemon HOME news feed every third day and opens a Copilot-drafted draft pull request when the Champions regulation changes
-- A `Dependabot Rebase` workflow that asks Dependabot to rebase an armed pull request after `main` moves. Create and rotate its token with the [Dependabot rebase runbook](./docs/maintenance/dependabot-rebase.md)
-
-## Planned Work
-
-These are still in progress, not yet available:
-
-- A more complete autoresearch workflow beyond the current local, manually run harness
-- Broader eval coverage beyond the current fixed-case autoresearch loop
-- Adapters for explicitly supported replay exports beyond the repository-defined JSON contract
-- Broader exact calc support beyond damage, KO, and survival
-
-## Principles
-
-- Verify current meta, rules, and legality before presenting them as current.
-- Prefer official rules sources; use community sources only for trends and archetype interpretation.
-- Keep shared coaching logic AI-tool-neutral where possible.
-- Avoid duplicating skill logic into AI-tool-specific copies.
-- Judge skill changes against test cases and rubrics, not just cleaner wording.
-
-## Where To Start
-
-**For VGC players:**
-- [Skill Catalog](#skill-catalog): overview of what VGC Coach can help with today
-- [Install As Plugin](#install-as-plugin): fastest packaged install path
-
-**For developers and contributors:**
-- [Contribute From Source](#contribute-from-source): clone/open workflow for editing the repo
-- [Codex runtime](./docs/runtime/codex.md), [Claude Code runtime](./docs/runtime/claude-code.md), [OpenCode runtime](./docs/runtime/opencode.md): AI-tool-specific usage notes
-- [RELEASE_NOTES.md](./RELEASE_NOTES.md): generated release summary for the current packaged version
-- [Dependabot rebase runbook](./docs/maintenance/dependabot-rebase.md): create and rotate the token that rebases armed Dependabot pull requests
-- [AGENTS.md](./AGENTS.md): repo rules and project constraints
-- [CONTRIBUTING.md](./CONTRIBUTING.md): contribution scope and validation expectations
-- [SECURITY.md](./SECURITY.md): responsible disclosure guidance
-- [data/snapshots/README.md](./data/snapshots/README.md): meta snapshot artifact format
-
-## Repo Layout
-
-Abridged view of the main public-facing structure:
+## Estructura del repositorio
 
 ```text
 vgc-coach/
 ├── AGENTS.md
-├── CONTRIBUTING.md
 ├── LICENSE
+├── NOTICE
 ├── README.md
-├── RELEASE_NOTES.md
-├── SECURITY.md
-├── VERSION
-├── .agents/
-│   ├── plugins/
-│   │   └── marketplace.json
-│   └── skills/
-├── .claude-plugin/
-│   └── marketplace.json
-├── .claude/
-│   ├── CLAUDE.md
-│   └── skills/
-├── .opencode/
-│   ├── commands/
-│   └── skills/
-├── opencode.json
-├── data/
-│   ├── fixtures/
-│   │   └── evals/
-│   ├── rubrics/
-│   └── snapshots/
+├── README.en.md
 ├── docs/
-│   ├── evals/
+│   ├── README.md
+│   ├── installation.md
+│   ├── sources.md
+│   ├── team-building.md
+│   ├── validation.md
 │   ├── runtime/
 │   └── skills/
-├── plugins/
-│   ├── vgc-coach-codex/
-│   ├── vgc-coach-claude/
-│   └── vgc-coach-opencode/
+├── skills/
+├── plugins/          # generado
+├── data/
+│   ├── fixtures/evals/
+│   ├── rubrics/
+│   └── snapshots/
 ├── tools/
-└── skills/
+└── site/
 ```
+
+## Licencia y atribución
+
+Apache-2.0. Consulta [LICENSE](./LICENSE) y [NOTICE](./NOTICE).
+
+- Upstream: [NoahJenkins/vgc-coach](https://github.com/NoahJenkins/vgc-coach)
+- Investigación de endpoints y TTLs: [VGC-Reporter](https://github.com/felipesuarez-dev/VGC-Reporter) (MIT)

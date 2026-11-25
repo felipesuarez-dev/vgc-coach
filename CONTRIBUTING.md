@@ -60,7 +60,16 @@ Run the complete repository validation entrypoint before opening a pull request:
 python3 tools/validate.py
 ```
 
-The default scope runs every Python test, checks the rendered source registry, checks generated plugin drift, and builds the production site. For focused CI-equivalent runs, use `python3 tools/validate.py --scope core` or `python3 tools/validate.py --scope site`.
+The default scope runs every Python test, checks the rendered source registry, checks offline probe coverage, checks generated plugin drift, and builds the production site. For focused CI-equivalent runs, use `python3 tools/validate.py --scope core` or `python3 tools/validate.py --scope site`.
+
+Live source evidence:
+
+```sh
+python3 tools/probe_sources.py
+python3 tools/probe_sources.py --markdown
+python3 tools/resolve_regulation.py --check-registry
+python3 tools/fetch_labmaus.py completed-tournaments --from 2026-11-17 --to 2026-11-24
+```
 
 If your change affects skill behavior, validate it against the relevant fixed eval cases and rubric:
 

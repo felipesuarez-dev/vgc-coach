@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import contextlib
+import io
+import json
 import sys
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest import mock
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -274,6 +278,56 @@ class ResolveRegulationTests(unittest.TestCase):
         )
         mismatches = resolve_regulation.compare_with_registry(resolved, registry)
         self.assertEqual(mismatches, [])
+
+    def test_json_cli_output_stays_valid_with_preview(self):
+        resolved = resolve_regulation.ResolvedRegulation(
+            checked_at="2026-11-25T12:00:00Z",
+            feed_url="https://news.pokemon-home.com/en/json/list.json",
+            feed_entry_id="878",
+            page_url="https://news.pokemon-home.com/en/page/878.html",
+            regulation_id="regulation-m-d",
+            code="M-D",
+            display_name="Regulation Set M-D",
+            start="2026-12-02T02:00:00Z",
+            end="2027-03-03T01:59:00Z",
+            phase="upcoming",
+            roster_url=None,
+            roster_count=0,
+            roster_pending=True,
+        )
+        registry = registry_with(
+            source(
+                "regulation-set-m-c",
+                "official_regulation",
+                status="current",
+                regulation_id="regulation-m-c",
+                url="https://news.pokemon-home.com/en/page/816.html",
+                start="2026-09-09T02:00:00Z",
+                end="2026-12-02T01:59:00Z",
+            ),
+            source(
+                "regulation-set-m-d",
+                "official_regulation",
+                status="upcoming",
+                regulation_id="regulation-m-d",
+                url="https://news.pokemon-home.com/en/page/878.html",
+                start="2026-12-02T02:00:00Z",
+                end="2027-03-03T01:59:00Z",
+            ),
+        )
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with (
+            mock.patch.object(resolve_regulation, "resolve_regulation", return_value=resolved),
+            mock.patch.object(resolve_regulation, "load_registry", return_value=registry),
+            contextlib.redirect_stdout(stdout),
+            contextlib.redirect_stderr(stderr),
+        ):
+            code = resolve_regulation.main(["--json", "--preview"])
+        self.assertEqual(code, 0)
+        payload = json.loads(stdout.getvalue())
+        self.assertEqual(payload["code"], "M-D")
+        self.assertIn("Upcoming regulation detected", stderr.getvalue())
 
 
 if __name__ == "__main__":

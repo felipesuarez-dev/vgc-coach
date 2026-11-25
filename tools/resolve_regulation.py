@@ -390,7 +390,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.check_registry and blocking_mismatches(mismatches):
         return 1
     if args.preview and resolved.phase == "upcoming":
-        print("Upcoming regulation detected; prepare it without replacing the current one.")
+        message = "Upcoming regulation detected; prepare it without replacing the current one."
+        if args.json:
+            print(message, file=sys.stderr)
+        else:
+            print(message)
     return 0
 
 
